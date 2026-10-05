@@ -1,0 +1,16 @@
+node_modules/
+.pnpm-store/
+.next/
+out/
+coverage/
+.env
+.env.local
+.env.*
+!.env.example
+*.log
+*.tsbuildinfo
+.DS_Store
+.codex-doc-review/
+.codex-*.png
+.storage/
+src/generated/prisma/

@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #faf8f2;
+  --foreground: #111c35;
+  --card: #ffffff;
+  --card-foreground: var(--foreground);
+  --popover: #ffffff;
+  --popover-foreground: var(--foreground);
+  --primary: #e98a08;
+  --primary-foreground: #111c35;
+  --secondary: #f5f1e7;
+  --secondary-foreground: var(--foreground);
+  --muted: #f2f1eb;
+  --muted-foreground: #657081;
+  --accent: #ddf5f0;
+  --accent-foreground: #077d76;
+  --destructive: #e8443c;
+  --border: #e7e5dd;
+  --ring: var(--primary);
+  --sidebar: #101c35;
+  --radius: 0.8rem;
+}
+
+.dark {
+  --background: #0c172b;
+  --foreground: #f9f7f1;
+  --card: #152239;
+  --card-foreground: var(--foreground);
+  --popover: #152239;
+  --popover-foreground: var(--foreground);
+  --primary: #ffb22e;
+  --primary-foreground: #111c35;
+  --secondary: #20304a;
+  --secondary-foreground: var(--foreground);
+  --muted: #20304a;
+  --muted-foreground: #a6b2c4;
+  --accent: #133d42;
+  --accent-foreground: #62d5c7;
+  --destructive: #ff7067;
+  --border: #2b3a50;
+  --ring: var(--primary);
+  --sidebar: #09152a;
+}
+
+@theme inline {
+  --font-sans:
+    "Aptos", "Inter", "Segoe UI Variable Text", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-display:
+    "Aptos Display", "Inter", "Segoe UI Variable Display", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono:
+    "Cascadia Code", "Cascadia Mono", Consolas, ui-monospace, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --radius-sm: calc(var(--radius) * 0.75);
+  --radius-md: calc(var(--radius) * 0.875);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    "Aptos", "Inter", "Segoe UI Variable Text", ui-sans-serif, system-ui,
+    sans-serif;
+  letter-spacing: -0.006em;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+h1,
+h2,
+h3 {
+  font-family:
+    "Aptos Display", "Inter", "Segoe UI Variable Display", ui-sans-serif,
+    sans-serif;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+::selection {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground;
+  }
+  .nav-item {
+    @apply relative mx-3 flex h-10 items-center gap-3 rounded-xl px-3 text-[13px] text-white/65 transition-colors hover:bg-white/6 hover:text-white;
+  }
+  .nav-item-active {
+    @apply bg-amber-400/12 font-semibold text-amber-300 before:absolute before:bottom-2 before:left-0 before:top-2 before:w-0.5 before:rounded-full before:bg-amber-400;
+  }
+  .signal-field {
+    background-image: linear-gradient(
+      145deg,
+      color-mix(in oklch, var(--accent) 72%, transparent),
+      transparent 58%
+    );
+  }
+
+  .auth-surface {
+    background:
+      radial-gradient(
+        circle at 18% 21%,
+        rgb(255 184 65 / 0.13),
+        transparent 18rem
+      ),
+      radial-gradient(
+        circle at 88% 77%,
+        rgb(255 165 35 / 0.09),
+        transparent 25rem
+      ),
+      linear-gradient(135deg, #fffdf7 0%, #fff5e3 48%, #fffaf0 100%);
+  }
+
+  .auth-orbit {
+    position: absolute;
+    border: 1px solid rgb(231 178 84 / 0.13);
+    border-radius: 48% 52% 44% 56%;
+    pointer-events: none;
+  }
+
+  .auth-orbit-top {
+    width: 78rem;
+    height: 56rem;
+    left: -28rem;
+    top: -34rem;
+    transform: rotate(16deg);
+    box-shadow: 0 0 0 6rem rgb(255 255 255 / 0.22);
+  }
+
+  .auth-orbit-bottom {
+    width: 68rem;
+    height: 45rem;
+    left: -4rem;
+    bottom: -35rem;
+    transform: rotate(-9deg);
+    box-shadow: 0 0 0 5rem rgb(255 255 255 / 0.22);
+  }
+}
+
+.auth-surface .auth-submit {
+  background-color: #ff981d;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgb(255 152 29 / 0.2);
+}
+
+.auth-surface .auth-submit:hover {
+  background-color: #ee870b;
+}
+
+.auth-surface .auth-github {
+  background-color: #101a35;
+  color: #ffffff;
+}
+
+.auth-surface .auth-github:hover {
+  background-color: #1e2e4d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
