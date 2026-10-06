@@ -3,6 +3,7 @@ import { randomBytes, createHash } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
 import { unlink } from "node:fs/promises";
 import path from "node:path";
+import { del } from "@vercel/blob";
 
 const db = new PrismaClient();
 const base = process.env.LUME_TEST_URL ?? "http://localhost:3000";
@@ -361,7 +362,10 @@ try {
     where: { bug: { project: { organizationId: { in: orgIds } } } },
     select: { storageKey: true },
   });
-  for (const file of files)
+  for (const file of files) {
+    if (file.storageKey && /^blob:[a-f0-9-]{36}$/.test(file.storageKey)) {
+      await del(`evidencias/${file.storageKey.slice(5)}`);
+    }
     if (file.storageKey && /^[a-f0-9-]{36}$/.test(file.storageKey)) {
       await unlink(
         path.join(
@@ -370,6 +374,7 @@ try {
         ),
       ).catch(() => {});
     }
+  }
   await db.$transaction(async (tx) => {
     await tx.testRun.deleteMany({
       where: { project: { organizationId: { in: orgIds } } },

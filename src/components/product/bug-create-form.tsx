@@ -14,6 +14,7 @@ import { findRelatedBugs } from "@/lib/domain/related-bugs";
 import { createBugAction } from "@/lib/data/bug-actions";
 import type { RelatedBugCandidate } from "@/lib/domain/related-bugs";
 import { bugReportSchema } from "@/lib/validation/bug";
+import { evidenceMaxMb, evidenceMaxBytes } from "@/lib/validation/evidence";
 
 const selectClassName =
   "h-10 w-full rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/15";
@@ -79,6 +80,15 @@ export function BugCreateForm({
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (
+      evidenceFiles.length > 10 ||
+      evidenceFiles.some((file) => file.size > evidenceMaxBytes)
+    ) {
+      setFormError(
+        `Selecione até 10 arquivos, com no máximo ${evidenceMaxMb} MB cada.`,
+      );
+      return;
+    }
     const result = bugReportSchema.safeParse({
       ...report,
       reproductionSteps,
@@ -332,6 +342,9 @@ export function BugCreateForm({
                     : "arquivos selecionados"}
                 </p>
               )}
+              <p className="text-xs text-muted-foreground">
+                Até 10 arquivos, {evidenceMaxMb} MB por arquivo.
+              </p>
             </div>
           </div>
         </section>

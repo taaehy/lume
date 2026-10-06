@@ -2,7 +2,6 @@ import "server-only";
 import { Prisma, BugStatus, Priority } from "@prisma/client";
 import { cookies } from "next/headers";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
@@ -22,13 +21,15 @@ import { bugReportSchema } from "@/lib/validation/bug";
 import { HttpError } from "@/lib/http-error";
 import { appOrigin } from "@/lib/auth/providers";
 import { emailConfigured, sendTransactionalEmail } from "@/lib/email";
+import {
+  saveEvidence,
+  loadEvidence,
+  removeEvidence,
+} from "@/lib/evidence-storage";
+import { evidenceMaxMb, evidenceMaxBytes } from "@/lib/validation/evidence";
 
 const nonempty = z.string().trim().min(2).max(160);
 const roles = z.enum(["OWNER", "ADMIN", "QA", "DEVELOPER", "VIEWER"]);
-const storage = path.resolve(
-  /* turbopackIgnore: true */
-  process.env.LUME_STORAGE_PATH || path.join(process.cwd(), ".storage"),
-);
 const json = (data: unknown, status = 200) =>
   Response.json({ data }, { status, headers: { "Cache-Control": "no-store" } });
 const tokenDigest = (value: string) =>
@@ -514,12 +515,12 @@ export async function handleApi(request: Request, segments: string[]) {
         if (
           !(file instanceof File) ||
           file.size < 1 ||
-          file.size > 20 * 1024 * 1024 ||
+          file.size > evidenceMaxBytes ||
           !(file.type in fileTypes)
         )
           throw new HttpError(
             422,
-            "Arquivo não permitido. Use PNG, JPEG, WebP, MP4, WebM, PDF, TXT ou JSON, até 20 MB.",
+            `Arquivo não permitido. Use PNG, JPEG, WebP, MP4, WebM, PDF, TXT ou JSON, até ${evidenceMaxMb} MB.`,
           );
         const bytes = Buffer.from(await file.arrayBuffer());
         if (
@@ -542,9 +543,7 @@ export async function handleApi(request: Request, segments: string[]) {
             "O conteúdo não corresponde ao tipo informado.",
           );
         const key = randomUUID();
-        const destination = path.join(/* turbopackIgnore: true */ storage, key);
-        await mkdir(storage, { recursive: true });
-        await writeFile(destination, bytes, { flag: "wx" });
+        const storageKey = await saveEvidence(key, bytes, file.type);
         try {
           const attachment = await prisma.$transaction(
             async (tx) => {
@@ -556,7 +555,7 @@ export async function handleApi(request: Request, segments: string[]) {
               const saved = await tx.bugAttachment.create({
                 data: {
                   bugId: bug.id,
-                  storageKey: key,
+                  storageKey,
                   name: path.basename(file.name).slice(0, 180),
                   kind: fileTypes[file.type] as "IMAGE" | "VIDEO" | "FILE",
                   mimeType: file.type,
@@ -597,7 +596,7 @@ export async function handleApi(request: Request, segments: string[]) {
           );
           return json(attachment, 201);
         } catch (error) {
-          await unlink(destination);
+          await removeEvidence(storageKey);
           throw error;
         }
       }
@@ -606,14 +605,11 @@ export async function handleApi(request: Request, segments: string[]) {
       const item = await prisma.bugAttachment.findFirst({
         where: { id, bug: { projectId: scope.projectId } },
       });
-      if (!item?.storageKey || !/^[a-f0-9-]{36}$/.test(item.storageKey))
+      if (!item?.storageKey)
         throw new HttpError(404, "Arquivo não encontrado.");
       let bytes;
       try {
-        bytes = await readFile(
-          /* turbopackIgnore: true */
-          path.join(/* turbopackIgnore: true */ storage, item.storageKey),
-        );
+        bytes = await loadEvidence(item.storageKey);
       } catch {
         throw new HttpError(404, "Arquivo indisponível no armazenamento.");
       }

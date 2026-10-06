@@ -1,0 +1,11 @@
+.git
+.agents
+.storage
+.pnpm-store
+.next
+node_modules
+.env*
+!.env.example
+skills-lock.json
+*.log
+*.tsbuildinfo

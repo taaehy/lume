@@ -2,6 +2,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { evidenceMaxMb, evidenceMaxBytes } from "@/lib/validation/evidence";
 
 export function AttachmentUploader({ friendlyId }: { friendlyId: string }) {
   const router = useRouter();
@@ -11,6 +12,11 @@ export function AttachmentUploader({ friendlyId }: { friendlyId: string }) {
     event.preventDefault();
     const form = event.currentTarget;
     const body = new FormData(form);
+    const file = body.get("file");
+    if (file instanceof File && file.size > evidenceMaxBytes) {
+      setMessage(`Selecione um arquivo de até ${evidenceMaxMb} MB.`);
+      return;
+    }
     setPending(true);
     setMessage("");
     try {
@@ -46,8 +52,8 @@ export function AttachmentUploader({ friendlyId }: { friendlyId: string }) {
         />
       </label>
       <p className="text-xs text-muted-foreground">
-        Até 20 MB por arquivo. Os arquivos ficam privados e só podem ser
-        acessados pela equipe do projeto.
+        Até {evidenceMaxMb} MB por arquivo. Os arquivos ficam privados e só
+        podem ser acessados pela equipe do projeto.
       </p>
       <Button size="sm" disabled={pending}>
         {pending ? "Enviando…" : "Enviar arquivo"}

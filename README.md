@@ -4,6 +4,8 @@ Clareza para entregar melhor.
 
 Uma plataforma de gestão de qualidade de software que reúne bugs, evidências, testes e releases em um só lugar. Projeto de portfólio com interface responsiva, API própria e dados persistidos em PostgreSQL.
 
+[Acessar o Lume](https://lume-ecru-two.vercel.app) — crie uma conta para experimentar. A demonstração usa banco online e anexos privados de até 4 MB.
+
 ## O que você pode fazer
 
 - Organizar bugs em uma lista ou no Kanban, com responsáveis, comentários e histórico.
@@ -40,6 +42,6 @@ Abra [localhost:3000](http://localhost:3000) e crie sua conta. Para carregar exe
 
 ## Escopo
 
-O acesso por e-mail e senha funciona localmente. Login com Google/GitHub e envio de e-mails são opcionais, dependem de credenciais externas e ainda não foram validados com os provedores. O módulo de testes registra execuções de QA; não executa pipelines de CI/CD.
+O acesso por e-mail e senha está disponível na demonstração. Login com Google/GitHub e envio de e-mails são opcionais e não estão ativados. O módulo de testes registra execuções de QA; não executa pipelines de CI/CD.
 
 As decisões técnicas e os cuidados para hospedagem estão em [Arquitetura](docs/architecture.md).

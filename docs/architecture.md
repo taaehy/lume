@@ -28,7 +28,7 @@ A criação incrementa a sequência do projeto e grava bug e histórico em uma t
 
 A edição verifica os vínculos do responsável e da release. Comentários e evidências geram histórico. A pontuação do relato considera anexos efetivamente persistidos, não a quantidade declarada pelo navegador.
 
-Os arquivos são gravados em uma pasta privada, com nome aleatório. A API verifica tipos, tamanho e assinaturas dos formatos binários. O download exige acesso ao projeto, evita caminhos informados pelo cliente e usa Content-Disposition e nosniff. Este armazenamento local requer volume persistente em produção; não há serviço de object storage nem varredura antimalware implementados.
+Na demonstração, os arquivos são gravados no Vercel Blob privado, com nome aleatório e limite de 4 MB. Localmente, são gravados em uma pasta privada, com limite padrão de 20 MB. A API verifica tipos, tamanho e assinaturas dos formatos binários. O download exige acesso ao projeto, evita caminhos informados pelo cliente e usa Content-Disposition e nosniff. Não há varredura antimalware implementada.
 
 ## Testes, releases e indicadores
 
@@ -59,4 +59,6 @@ Em 5 de outubro de 2026, foram confirmados:
 
 Os testes criaram e removeram seus próprios registros isolados. As contas e bugs que existiam antes foram preservados. Recuperação foi verificada com token de teste inserido no banco; envio real de e-mail e autorização externa não foram simulados como resultados concluídos.
 
-A verificação não substitui testes de carga, auditoria de segurança, monitoramento ou validação no ambiente de produção.
+As 89 verificações de integração também passaram na demonstração publicada na Vercel, com PostgreSQL Neon e Vercel Blob privado. Os registros e anexos temporários foram removidos ao final. Login e cadastro foram conferidos no navegador em largura de celular, sem transbordamento horizontal.
+
+A verificação não substitui testes de carga, auditoria de segurança ou monitoramento contínuo.
